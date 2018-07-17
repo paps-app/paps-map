@@ -6,30 +6,46 @@ import {
   GoogleMap,
   DirectionsRenderer
 } from "react-google-maps";
+import { SearchBox } from "react-google-maps/lib/components/places/SearchBox";
 
-// let google = {};
+import get from "lodash.get";
 
-/* eslint-disable no-undef */
+import { Input } from "./styles";
 
-const MapWithADirectionsRenderer = compose(
+const EMG = {
+  lat: 14.72653,
+  lng: -17.4414
+};
+
+const URBAM = {
+  lat: 14.73515,
+  lng: -17.45741
+};
+
+const MapWithASearchBox = compose(
   withProps({
     googleMapURL:
-      "https://maps.googleapis.com/maps/api/js?key=AIzaSyC4R6AN7SmujjPUIGKdyao2Kqitzr1kiRg&v=3.exp&libraries=geometry,drawing,places",
+      "https://maps.googleapis.com/maps/api/js?key=AIzaSyAZnF19RSZU0ud4oeIbsOmru1iPnXlpl7w&v=3.exp&libraries=geometry,drawing,places",
     loadingElement: <div style={{ height: `100%` }} />,
-    containerElement: <div style={{ height: `400px` }} />,
+    containerElement: <div style={{ height: `600px` }} />,
     mapElement: <div style={{ height: `100%` }} />
   }),
   withScriptjs,
   withGoogleMap,
   lifecycle({
     componentDidMount() {
+      let OrginID = null;
+      let DestinationID = null;
+
       const DirectionsService = new google.maps.DirectionsService();
 
       DirectionsService.route(
         {
-          origin: new google.maps.LatLng(41.85073, -87.65126),
-          destination: new google.maps.LatLng(41.85258, -87.65141),
-          travelMode: google.maps.TravelMode.DRIVING
+          origin: EMG,
+          destination: URBAM,
+          travelMode: google.maps.TravelMode.DRIVING,
+          provideRouteAlternatives: true,
+          optimizeWaypoints: true
         },
         (result, status) => {
           if (status === google.maps.DirectionsStatus.OK) {
@@ -41,12 +57,103 @@ const MapWithADirectionsRenderer = compose(
           }
         }
       );
+    },
+    componentWillMount() {
+      let refs = {};
+
+      this.setState({
+        bound: null,
+        center: EMG,
+        markers: [],
+        onMapMounted: ref => {
+          refs.map = ref;
+        },
+        onBoundsChanged: () => {
+          this.setState({
+            bounds: refs.map.getBounds(),
+            center: refs.map.getCenter()
+          });
+        },
+        onOriginBoxMounted: ref => {
+          refs.originBox = ref;
+        },
+        onDestinationBoxMounted: ref => {
+          refs.destinationBox = ref;
+        },
+        onDirectionsMounted: ref => {
+          refs.directionsRef = ref;
+        },
+        onDirectionsChanged: () => {
+          this.setState({
+            newDirections: refs.directionsRef.getDirection()
+          });
+        },
+        onSearchBoxMounted: ref => {
+          refs.searchBox = ref;
+        },
+        onPlacesChanged: () => {
+          const places: Array = refs.originBox.getPlaces();
+          const bounds = new google.maps.LatLngBounds();
+
+          places.forEach(place => {
+            if (place.geometry.viewport) {
+              bounds.union(place.geometry.viewport);
+            } else {
+              bounds.extend(place.geometry.location);
+            }
+          });
+          const nextMarkers = places.map(place => ({
+            position: place.geometry.location
+          }));
+          const nextCenter = get(nextMarkers, "0.position", this.state.center);
+
+          this.setState({
+            center: nextCenter,
+            markers: nextMarkers
+          });
+        }
+      });
     }
   })
 )(props => (
-  <GoogleMap defaultZoom={7} defaultCenter={new google.maps.LatLng(41.85073, -87.65126)}>
-    {props.directions && <DirectionsRenderer directions={props.directions} />}
+  <GoogleMap
+    ref={props.onMapMounted}
+    defaultZoom={15}
+    defaultCenter={props.center}
+    onBoundsChanged={props.onBoundsChanged}
+  >
+    <OriginInputBox {...props} />
+    <DestinationInputBox {...props} />
+    {props.directions && (
+      <DirectionsRenderer
+        ref={props.onDirectionsMounted}
+        onDirectionsChanged={props.onDirectionsChanged}
+        directions={props.directions}
+      />
+    )}
   </GoogleMap>
 ));
 
-export default MapWithADirectionsRenderer;
+const OriginInputBox = ({ onOriginBoxMounted, bounds, onPlacesChanged }) => (
+  <SearchBox
+    ref={onOriginBoxMounted}
+    bounds={bounds}
+    controlPosition={google.maps.ControlPosition.TOP_LEFT}
+    onPlacesChanged={onPlacesChanged}
+  >
+    <Input type="text" placeholder="Entrer le point de départ" />
+  </SearchBox>
+);
+
+const DestinationInputBox = ({ onDestinationBoxMounted, bounds, onPlacesChanged }) => (
+  <SearchBox
+    ref={onDestinationBoxMounted}
+    bounds={bounds}
+    controlPosition={google.maps.ControlPosition.TOP_LEFT}
+    onPlacesChanged={onPlacesChanged}
+  >
+    <Input type="text" placeholder="Entrer la destination" />
+  </SearchBox>
+);
+
+export default MapWithASearchBox;
