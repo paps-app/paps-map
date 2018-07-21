@@ -3,7 +3,7 @@ import { MarkerWithLabel } from "react-google-maps/lib/components/addons/MarkerW
 
 const originStyle = {
   backgroundColor: "#2196F3",
-  fontSize: "14px",
+  fontSize: "12px",
   padding: "6px",
   color: "white"
 };
@@ -15,11 +15,12 @@ const destStyle = {
   color: "white"
 };
 
-const LabelledMarker = ({ position, dir }) => (
+const LabelledMarker = ({ position, dir, icon }) => (
   <MarkerWithLabel
     position={position}
     labelAnchor={new google.maps.Point(0, 0)}
     labelStyle={dir === "origin" ? originStyle : destStyle}
+    icon={icon}
   >
     {dir === "origin" ? <span>Point de départ</span> : <span>Point d'arrivée</span>}
   </MarkerWithLabel>

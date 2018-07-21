@@ -1,12 +1,25 @@
 import React from "react";
-import { GoogleMap, withGoogleMap, DirectionsRenderer, Marker } from "react-google-maps";
-import { SearchBox } from "react-google-maps/lib/components/places/SearchBox";
-// import { MarkerWithLabel } from "react-google-maps/lib/components/addons/MarkerWithLabel";
 
+import { GoogleMap, withGoogleMap, DirectionsRenderer } from "react-google-maps";
 import get from "lodash.get";
 
 import LabelledMarker from "./MarkerWithLabel";
-import { Input, DistanceOutput, ModeSelector } from "./styles";
+import WillBeCharged from "./WillBeCharged";
+
+import OriginPin from "../icons/originPin.svg";
+import DestinationPin from "../icons/destinationPin.svg";
+
+import {
+  SearchBox,
+  OriginInput,
+  DestinationInput,
+  InputGroup,
+  OuputGroup,
+  Separator,
+  ModeSelector
+} from "./styles";
+
+import { computePlace } from "../utils";
 
 const EMG = {
   lat: 14.72653,
@@ -23,15 +36,6 @@ const EMG = {
 //   lng: -17.4733996
 // };
 
-const computePlaces = (places, bounds) =>
-  places.forEach(place => {
-    if (place.geometry.viewport) {
-      bounds.union(place.geometry.viewport);
-    } else {
-      bounds.extend(place.geometry.location);
-    }
-  });
-
 const GoogleMapsWrapper = withGoogleMap(props => {
   const { onMapMounted, ...otherProps } = props;
   return (
@@ -45,9 +49,9 @@ class MapPage extends React.Component {
   static defaultProps = {
     googleMapURL:
       "https://maps.googleapis.com/maps/api/js?key=AIzaSyAZnF19RSZU0ud4oeIbsOmru1iPnXlpl7w&v=3.exp&libraries=geometry,drawing,places",
-    loadingElement: <div style={{ height: `100%` }} />,
-    containerElement: <div style={{ height: "500px" }} />,
-    mapElement: <div style={{ height: `100%` }} />,
+    loadingElement: <div style={{ height: "100%" }} />,
+    containerElement: <div style={{ height: "100%" }} />,
+    mapElement: <div style={{ height: "100%" }} />,
     defaultZoom: 13,
     defaultCenter: EMG
   };
@@ -61,22 +65,58 @@ class MapPage extends React.Component {
     distance: null
   };
 
+  _mapRef = null;
+  _directionRef = null;
+  _originRef = null;
+  _destinationRef = null;
+  originAutocomplete = null;
+  destinationAutocomplete = null;
+
+  componentDidMount() {
+    const options = {
+      componentRestrictions: { country: "sn" }
+    };
+
+    const interval = window.setInterval(() => {
+      if (this._mapRef) {
+        this.originAutocomplete = new google.maps.places.Autocomplete(
+          this._originRef,
+          options
+        );
+        this.destinationAutocomplete = new google.maps.places.Autocomplete(
+          this._destinationRef,
+          options
+        );
+        this.originAutocomplete.addListener(
+          "place_changed",
+          this._handleOrginPlaceChanged
+        );
+        this.destinationAutocomplete.addListener(
+          "place_changed",
+          this._handleDestinationPlaceChanged
+        );
+        window.clearInterval(interval);
+      }
+    }, 500);
+  }
+
   getSnapshotBeforeUpdate(prevProps, prevState) {
     // Capture the destination state before it updates.
-    if (prevState.destination !== this.state.destination) {
+    if (
+      prevState.destination !== this.state.destination ||
+      prevState.origin !== this.state.origin
+    ) {
       return this.state.destination;
     }
     return null;
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    console.log("Mounted @ " + Date.now());
     let OrginID = this.state.origin;
     let DestinationID = this.state.destination;
     const DirectionsService = new google.maps.DirectionsService();
-    console.log({ snapshot });
 
-    if (OrginID && DestinationID) {
+    if (snapshot !== null && OrginID && DestinationID) {
       DirectionsService.route(
         {
           origin: OrginID,
@@ -84,11 +124,11 @@ class MapPage extends React.Component {
           travelMode: google.maps.TravelMode.DRIVING,
           waypoints: [
             {
-              location: OrginID,
-              stopover: false
+              location: OrginID
             },
             {
-              location: DestinationID
+              location: DestinationID,
+              stopover: false
             }
           ],
           provideRouteAlternatives: true,
@@ -96,15 +136,13 @@ class MapPage extends React.Component {
         },
         (result, status) => {
           if (status === google.maps.DirectionsStatus.OK) {
-            if (snapshot !== null) {
-              this.setState({
-                directions: result,
-                distance: google.maps.geometry.spherical.computeDistanceBetween(
-                  OrginID,
-                  DestinationID
-                )
-              });
-            }
+            this.setState({
+              directions: result,
+              distance: google.maps.geometry.spherical.computeDistanceBetween(
+                OrginID,
+                DestinationID
+              )
+            });
           } else {
             console.error(`Could not display directions due to: ${status}`);
           }
@@ -116,15 +154,10 @@ class MapPage extends React.Component {
     // }
   }
 
-  _mapRef = null;
-  _directionRef = null;
-  _originRef = null;
-  _destinationRef = null;
-
   _handleMapMounted = c => {
     if (!c || this._mapRef) return;
     this._mapRef = c;
-    console.log("Ref set later @ " + Date.now());
+    // console.log("Ref set later @ " + Date.now());
   };
 
   _onOriginBoxMounted = ref => {
@@ -155,47 +188,55 @@ class MapPage extends React.Component {
     this.setState({
       directions: newDirection
     });
+    console.log({ newDirection });
   };
 
-  _onOriginChanged = () => {
-    const originPlaces: Array = this._originRef.getPlaces();
+  _handleOrginPlaceChanged = () => {
+    let place = this.originAutocomplete.getPlace();
     const bounds = new google.maps.LatLngBounds();
 
-    computePlaces(originPlaces, bounds);
+    computePlace(place, bounds);
 
-    const nextMarkers = originPlaces.map(place => ({
-      position: place.geometry.location
-    }));
-    const nextOriginCenter = get(nextMarkers, "0.position", this.state.center);
-
-    console.log({ nextOriginCenter });
-
+    const nextMarkers = [{ position: place.geometry.location }];
+    const nextCenter = get(nextMarkers, "0.position", this.state.center);
     this.setState({
-      center: nextOriginCenter,
+      center: nextCenter,
       markers: nextMarkers,
-      origin: nextOriginCenter
+      origin: nextCenter
     });
+
     this._mapRef.fitBounds(bounds);
   };
 
-  _onDestinationChanged = () => {
-    const destinationPlaces: Array = this._destinationRef.getPlaces();
+  _handleDestinationPlaceChanged = () => {
+    let place = this.destinationAutocomplete.getPlace();
     const bounds = new google.maps.LatLngBounds();
 
-    computePlaces(destinationPlaces, bounds);
+    computePlace(place, bounds);
 
-    const nextMarkers = destinationPlaces.map(place => ({
-      position: place.geometry.location
-    }));
-    const nextDestinationCenter = get(nextMarkers, "0.position", this.state.center);
-
-    console.log({ nextDestinationCenter });
-
+    const nextMarkers = [{ position: place.geometry.location }];
+    const nextCenter = get(nextMarkers, "0.position", this.state.center);
     this.setState({
-      markers: nextMarkers,
-      destination: nextDestinationCenter
+      center: nextCenter,
+      // markers: nextMarkers,
+      destination: nextCenter
     });
-    // this._mapRef.fitBounds(bounds);
+
+    this._mapRef.fitBounds(bounds);
+  };
+
+  _onOriginChanged = e => {
+    // When the user starts changing the origin again!
+    if (this.state.origin && this.state.destination) {
+      this.setState({
+        // origin: null,
+        // markers: null,
+        // directions: null,
+        // destination: null,
+        // distance: null
+      });
+      // this._destinationRef.value = "";
+    }
   };
 
   render() {
@@ -207,69 +248,75 @@ class MapPage extends React.Component {
           onBoundsChanged={this._handleBoundsChanged}
           {...props}
         >
-          <OriginInputBox
-            onOriginBoxMounted={this._onOriginBoxMounted}
-            onPlacesChanged={this._onOriginChanged}
-          />
-          <DestinationInputBox
-            onDestinationBoxMounted={this._onDestinationBoxMounted}
-            onPlacesChanged={this._onDestinationChanged}
-          />
-          {state.origin && <LabelledMarker position={state.origin} dir="origin" />}
+          {state.origin && (
+            <LabelledMarker position={state.origin} dir="origin" icon={OriginPin} />
+          )}
           {state.destination && (
-            <LabelledMarker position={state.destination} dir="destination" />
+            <LabelledMarker
+              position={state.destination}
+              dir="destination"
+              icon={DestinationPin}
+            />
           )}
           {state.directions && (
             <DirectionsRenderer
               ref={this._onDirectionsMounted}
-              onDirectionsChanged={this._onDirectionsChanged}
+              onDirectionsChanged={this._onDirectionsMounted}
               directions={state.directions}
+              options={{
+                suppressMarkers: true,
+                polylineOptions: { strokeColor: "#587084", strokeWeight: 5 }
+              }}
             />
           )}
         </GoogleMapsWrapper>
-        <SelectorMode />
-        {state.distance && (
-          <DistanceOutput>
-            <div>{Math.round(state.distance) / 1000}km</div>
-          </DistanceOutput>
-        )}
+        <SearchBox>
+          <InputGroup>
+            <SelectorMode />
+            <OriginInput>
+              <label htmlFor="origin" />
+              <input
+                id="origin"
+                ref={this._onOriginBoxMounted}
+                type="text"
+                placeholder="Point de départ"
+                onChange={this._onOriginChanged}
+              />
+            </OriginInput>
+            <DestinationInput>
+              <label htmlFor="destination" />
+              <input
+                id="destination"
+                ref={this._onDestinationBoxMounted}
+                type="text"
+                placeholder="Point d'arrivée"
+              />
+            </DestinationInput>
+          </InputGroup>
+          <Separator />
+          <OuputGroup>
+            <WillBeCharged distance={state.distance} />
+          </OuputGroup>
+        </SearchBox>
       </React.Fragment>
     );
   }
 }
 
-const OriginInputBox = ({ onOriginBoxMounted, onPlacesChanged, bounds }) => (
-  <SearchBox
-    ref={onOriginBoxMounted}
-    bounds={bounds}
-    controlPosition={google.maps.ControlPosition.LEFT}
-    onPlacesChanged={onPlacesChanged}
-  >
-    <Input origin="yes" type="text" placeholder="Entrer le point de départ" />
-  </SearchBox>
-);
-
-const DestinationInputBox = ({ onDestinationBoxMounted, onPlacesChanged, bounds }) => (
-  <SearchBox
-    ref={onDestinationBoxMounted}
-    bounds={bounds}
-    controlPosition={google.maps.ControlPosition.LEFT}
-    onPlacesChanged={onPlacesChanged}
-  >
-    <Input dest="yes" type="text" placeholder="Entrer la destination" />
-  </SearchBox>
-);
-
 const SelectorMode = () => (
   <ModeSelector>
-    <input type="radio" name="type" id="changemode-walking" />
-    <label for="changemode-walking">Walking</label>
-    <input type="radio" name="type" id="changemode-transit" />
-    <label for="changemode-transit">Transit</label>
-    <input type="radio" name="type" id="changemode-driving" />
-    <label for="changemode-driving" checked="checked">
-      Driving
-    </label>
+    <div>
+      <input type="radio" name="type" id="Bike" onChange={Function} checked="checked" />
+      <label htmlFor="bike">Moto</label>
+    </div>
+    <div>
+      <input type="radio" name="type" id="pickup" disabled />
+      <label htmlFor="pickup">Pickup</label>
+    </div>
+    <div>
+      <input type="radio" name="type" id="van" disabled />
+      <label htmlFor="van">Van</label>
+    </div>
   </ModeSelector>
 );
 
