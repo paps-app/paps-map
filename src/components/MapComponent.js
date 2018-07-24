@@ -22,6 +22,11 @@ const URBAM = {
   lng: -17.45741
 };
 
+// const SONATEL = {
+//   lat: 14.713026,
+//   lng: -17.4733996
+// };
+
 const MapWithASearchBox = compose(
   withProps({
     googleMapURL:

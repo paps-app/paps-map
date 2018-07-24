@@ -22,7 +22,6 @@ export const SearchBox = styled.div`
   z-index: 1;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   background-color: white;
-  width: 330px;
 `;
 
 export const InputGroup = styled.div`
@@ -38,7 +37,6 @@ const FlexAndCenter = css`
 
 export const Separator = styled.div`
   background-color: #ffd39c;
-  ${"" /* height: 1em; */};
 `;
 
 export const BaseInput = styled.div`
@@ -54,7 +52,6 @@ export const BaseInput = styled.div`
 export const Input = styled(BaseInput)`
   display: flex;
   justify-content: center;
-  align-items: baseline;
 
   > input {
     background-color: #fff;
@@ -72,25 +69,25 @@ export const Input = styled(BaseInput)`
   label {
     cursor: pointer;
     margin-right: 12px;
-    width: 16px;
-    height: 16px;
+    width: 15px;
     background-size: cover;
   }
 `;
 
 export const OriginInput = styled(Input)`
   > label {
+    margin-top: 17px;
+    height: 15px;
     background-image: url(${OriginIcon});
   }
 `;
 
 export const DestinationInput = styled(Input)`
-  > input {
-    margin-top: 0.6rem;
-    margin-bottom: 1em;
-  }
+  margin-top: 0.7rem;
+  margin-bottom: 1em;
   > label {
-    width: 12px;
+    margin-top: 14px;
+    height: 19px;
     background-image: url(${DestinationIcon});
   }
 `;
@@ -99,7 +96,8 @@ export const OuputGroup = styled.div`
   padding: 1em;
   padding-bottom: 1.5em;
   font-size: 1.3em;
-  ${FlexAndCenter} justify-content: space-around;
+  ${FlexAndCenter};
+  justify-content: space-around;
 `;
 
 export const OutputGroupContent = styled.div`
@@ -133,10 +131,9 @@ export const PriceOuput = styled(OutputGroupContent)`
 `;
 
 export const ModeSelector = styled.div`
-  color: #fff;
-  background-color: #4d90fe;
+  color: #4c5b73;
   margin-bottom: 1.6em;
-  padding: 8px 5px;
+  padding: 8px 0;
   ${FlexAndCenter};
   justify-content: space-around;
 
@@ -148,9 +145,70 @@ export const ModeSelector = styled.div`
   label {
     font-size: 13px;
     cursor: pointer;
+    position: relative;
+    margin-right: 16px;
+
+    &[for="mapco"] {
+      margin-right: 0;
+    }
   }
 
   input[disabled] + label {
     pointer-events: none;
+  }
+
+  input[type="radio"] {
+    display: none;
+
+    &:checked + label em {
+      border-color: transparent;
+      i {
+        left: 21px;
+      }
+    }
+
+    &:checked + label[for="magma"] em {
+      background-color: #a8aac1;
+      i {
+        background-color: #6c788a;
+      }
+    }
+
+    &:checked + label[for="mapco"] em {
+      background-color: #cfb2db;
+      i {
+        background-color: #6c788a;
+      }
+    }
+
+    &:checked + label[for="snazzy"] em {
+      background-color: #aadaff;
+      i {
+        background-color: #6c788a;
+      }
+    }
+  }
+`;
+
+export const Switcher = styled.label`
+  em {
+    position: relative;
+    width: 38px;
+    height: 20px;
+    border-radius: 12px;
+    margin-right: 4px;
+    border: 1px solid currentColor;
+    transition: background-color 0.25s;
+
+    i {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 14px;
+      height: 14px;
+      border-radius: 10px;
+      background-color: currentColor;
+      transition: left 0.25s, background-color 0.25s;
+    }
   }
 `;

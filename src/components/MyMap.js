@@ -4,46 +4,28 @@ import { GoogleMap, withGoogleMap, DirectionsRenderer } from "react-google-maps"
 import get from "lodash.get";
 
 import LabelledMarker from "./MarkerWithLabel";
+import MapStyleSelector from "./MapStyleSelector";
 import WillBeCharged from "./WillBeCharged";
 
-import OriginPin from "../icons/originPin.svg";
-import DestinationPin from "../icons/destinationPin.svg";
+import { computePlace } from "../utils";
+
+import { getStorageMapStyle, setStorageMapStyle } from "./MapStyleSelector";
+
+import OriginPin from "../icons/D.png";
+import DestinationPin from "../icons/P.png";
 
 import {
   SearchBox,
   OriginInput,
   DestinationInput,
   InputGroup,
-  OuputGroup,
-  Separator,
-  ModeSelector
+  OuputGroup
 } from "./styles";
 
-import { computePlace } from "../utils";
-
-const EMG = {
-  lat: 14.72653,
-  lng: -17.4414
-};
-
-// const URBAM = {
-//   lat: 14.73515,
-//   lng: -17.45741
-// };
-
-// const SONATEL = {
-//   lat: 14.713026,
-//   lng: -17.4733996
-// };
-
-const GoogleMapsWrapper = withGoogleMap(props => {
-  const { onMapMounted, ...otherProps } = props;
-  return (
-    <GoogleMap ref={onMapMounted} {...otherProps}>
-      {props.children}
-    </GoogleMap>
-  );
-});
+import SnazzyMapStyle from "../mapStyles/snazzy.json";
+import VelouMap from "../mapStyles/velou.json";
+import MagmaMap from "../mapStyles/magma.json";
+import Mapco from "../mapStyles/mapco.json";
 
 class MapPage extends React.Component {
   static defaultProps = {
@@ -52,17 +34,22 @@ class MapPage extends React.Component {
     loadingElement: <div style={{ height: "100%" }} />,
     containerElement: <div style={{ height: "100%" }} />,
     mapElement: <div style={{ height: "100%" }} />,
-    defaultZoom: 13,
-    defaultCenter: EMG
+    defaultZoom: 12,
+    defaultCenter: {
+      lat: 14.72653,
+      lng: -17.4414
+    }
   };
 
   state = {
     bounds: null,
-    center: EMG,
+    waypoints: [],
+    center: {},
     markers: [],
     origin: null,
     destination: null,
-    distance: null
+    distance: null,
+    mapStyle: getStorageMapStyle() || "snazzy"
   };
 
   _mapRef = null;
@@ -225,18 +212,9 @@ class MapPage extends React.Component {
     this._mapRef.fitBounds(bounds);
   };
 
-  _onOriginChanged = e => {
-    // When the user starts changing the origin again!
-    if (this.state.origin && this.state.destination) {
-      this.setState({
-        // origin: null,
-        // markers: null,
-        // directions: null,
-        // destination: null,
-        // distance: null
-      });
-      // this._destinationRef.value = "";
-    }
+  _onStyleChange = e => {
+    this.setState({ mapStyle: e.target.value });
+    setStorageMapStyle(e.target.value);
   };
 
   render() {
@@ -246,17 +224,14 @@ class MapPage extends React.Component {
         <GoogleMapsWrapper
           onMapMounted={this._handleMapMounted}
           onBoundsChanged={this._handleBoundsChanged}
+          mapStyle={state.mapStyle}
           {...props}
         >
           {state.origin && (
-            <LabelledMarker position={state.origin} dir="origin" icon={OriginPin} />
+            <LabelledMarker position={state.origin} icon={OriginPin} dir="origin" />
           )}
           {state.destination && (
-            <LabelledMarker
-              position={state.destination}
-              dir="destination"
-              icon={DestinationPin}
-            />
+            <LabelledMarker position={state.destination} icon={DestinationPin} />
           )}
           {state.directions && (
             <DirectionsRenderer
@@ -265,14 +240,18 @@ class MapPage extends React.Component {
               directions={state.directions}
               options={{
                 suppressMarkers: true,
-                polylineOptions: { strokeColor: "#587084", strokeWeight: 5 }
+                polylineOptions: { strokeColor: "#4d90fe", strokeWeight: 5 }
               }}
             />
           )}
         </GoogleMapsWrapper>
         <SearchBox>
           <InputGroup>
-            <SelectorMode />
+            {/* <SelectorMode /> */}
+            <MapStyleSelector
+              selected={state.mapStyle}
+              onStyleChange={this._onStyleChange}
+            />
             <OriginInput>
               <label htmlFor="origin" />
               <input
@@ -293,7 +272,6 @@ class MapPage extends React.Component {
               />
             </DestinationInput>
           </InputGroup>
-          <Separator />
           <OuputGroup>
             <WillBeCharged distance={state.distance} />
           </OuputGroup>
@@ -303,21 +281,24 @@ class MapPage extends React.Component {
   }
 }
 
-const SelectorMode = () => (
-  <ModeSelector>
-    <div>
-      <input type="radio" name="type" id="Bike" onChange={Function} checked="checked" />
-      <label htmlFor="bike">Moto</label>
-    </div>
-    <div>
-      <input type="radio" name="type" id="pickup" disabled />
-      <label htmlFor="pickup">Pickup</label>
-    </div>
-    <div>
-      <input type="radio" name="type" id="van" disabled />
-      <label htmlFor="van">Van</label>
-    </div>
-  </ModeSelector>
-);
+const GoogleMapsWrapper = withGoogleMap(props => {
+  const { onMapMounted, children, mapStyle, ...otherProps } = props;
+  return (
+    <GoogleMap
+      ref={onMapMounted}
+      options={{ styles: MapStyles[mapStyle] }}
+      {...otherProps}
+    >
+      {children}
+    </GoogleMap>
+  );
+});
+
+const MapStyles = {
+  snazzy: SnazzyMapStyle,
+  velou: VelouMap,
+  magma: MagmaMap,
+  mapco: Mapco
+};
 
 export default MapPage;
