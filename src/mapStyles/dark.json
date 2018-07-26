@@ -79,9 +79,6 @@
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#5b91bb"
-      },
-      {
         "lightness": -37
       }
     ]

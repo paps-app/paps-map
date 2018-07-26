@@ -13,7 +13,7 @@ injectGlobal`
   }
   #root {
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
   }
   .map {
     width: 100%;

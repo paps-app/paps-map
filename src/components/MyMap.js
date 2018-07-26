@@ -45,7 +45,8 @@ class MapPage extends React.Component {
     defaultCenter: {
       lat: 14.72653,
       lng: -17.4414
-    }
+    },
+    tilt: 45
   };
 
   state = {
@@ -228,30 +229,6 @@ class MapPage extends React.Component {
     const { props, state } = this;
     return (
       <React.Fragment>
-        <GoogleMapsWrapper
-          onMapMounted={this._handleMapMounted}
-          onBoundsChanged={this._handleBoundsChanged}
-          mapStyle={state.mapStyle}
-          {...props}
-        >
-          {state.origin && (
-            <LabelledMarker position={state.origin} icon={OriginPin} dir="origin" />
-          )}
-          {state.destination && (
-            <LabelledMarker position={state.destination} icon={DestinationPin} />
-          )}
-          {state.directions && (
-            <DirectionsRenderer
-              ref={this._onDirectionsMounted}
-              onDirectionsChanged={this._onDirectionsMounted}
-              directions={state.directions}
-              options={{
-                suppressMarkers: true,
-                polylineOptions: { strokeColor: "#4d90fe", strokeWeight: 5 }
-              }}
-            />
-          )}
-        </GoogleMapsWrapper>
         <SearchBox>
           <InputGroup>
             {/* <SelectorMode /> */}
@@ -283,6 +260,30 @@ class MapPage extends React.Component {
             <WillBeCharged distance={state.distance} />
           </OuputGroup>
         </SearchBox>
+        <GoogleMapsWrapper
+          onMapMounted={this._handleMapMounted}
+          onBoundsChanged={this._handleBoundsChanged}
+          mapStyle={state.mapStyle}
+          {...props}
+        >
+          {state.origin && (
+            <LabelledMarker position={state.origin} icon={OriginPin} dir="origin" />
+          )}
+          {state.destination && (
+            <LabelledMarker position={state.destination} icon={DestinationPin} />
+          )}
+          {state.directions && (
+            <DirectionsRenderer
+              ref={this._onDirectionsMounted}
+              onDirectionsChanged={this._onDirectionsMounted}
+              directions={state.directions}
+              options={{
+                suppressMarkers: true,
+                polylineOptions: { strokeColor: "#4d90fe", strokeWeight: 5 }
+              }}
+            />
+          )}
+        </GoogleMapsWrapper>
       </React.Fragment>
     );
   }
@@ -293,7 +294,13 @@ const GoogleMapsWrapper = withGoogleMap(props => {
   return (
     <GoogleMap
       ref={onMapMounted}
-      options={{ styles: MapStyles[mapStyle] }}
+      options={{
+        styles: MapStyles[mapStyle],
+        mapTypeControlOptions: {
+          style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+        },
+        streetViewControl: true
+      }}
       {...otherProps}
     >
       {children}
