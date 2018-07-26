@@ -11,22 +11,26 @@ injectGlobal`
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
     margin: 0;
   }
+  #root {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+  .map {
+    width: 100%;
+  }
 `;
 
 // const originColor = "#2196f3";
 // const destinationColor = "#ff9800";
 
 export const SearchBox = styled.div`
-  position: absolute;
-  top: 3em;
-  left: 0.6em;
-  z-index: 1;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   background-color: white;
+  max-width: 320px;
 `;
 
 export const InputGroup = styled.div`
-  padding: 2em;
+  padding: 2em 1.2em;
   padding-bottom: 10px;
 `;
 
@@ -94,7 +98,7 @@ export const DestinationInput = styled(Input)`
 `;
 
 export const OuputGroup = styled.div`
-  padding: 1em;
+  padding: 1em 0.2em;
   padding-bottom: 1.5em;
   font-size: 1.3em;
   ${FlexAndCenter};
@@ -168,21 +172,21 @@ export const ModeSelector = styled.div`
       }
     }
 
-    &:checked + label[for="magma"] em {
+    &:checked + label[for="dark"] em {
       background-color: #a8aac1;
       i {
         background-color: #6c788a;
       }
     }
 
-    &:checked + label[for="mapco"] em {
-      background-color: #cfb2db;
+    &:checked + label[for="gris"] em {
+      background-color: #c9c9c9;
       i {
         background-color: #6c788a;
       }
     }
 
-    &:checked + label[for="snazzy"] em {
+    &:checked + label[for="lieux"] em {
       background-color: #aadaff;
       i {
         background-color: #6c788a;

@@ -6,10 +6,20 @@ const storage = window.localStorage;
 
 export const getStorageMapStyle = () => {
   let mapStyleObj = null;
+  let mapStyleSelected = null;
   if ("localStorage" in window && storage.getItem("__gmap__mapStyle__")) {
     mapStyleObj = JSON.parse(storage.getItem("__gmap__mapStyle__"));
+    const tmp = mapStyleObj.selectedStyle;
+    // Update monkey patch this value plz 🙂
+    if (/magma|mapco|snazzy/.test(tmp)) {
+      mapStyleSelected = "lieux";
+      console.log({ mapStyleSelected });
+    } else {
+      console.log({ mapStyleSelected });
+      mapStyleSelected = tmp;
+    }
   }
-  return mapStyleObj && mapStyleObj.selectedStyle;
+  return mapStyleObj && mapStyleSelected;
 };
 
 export const setStorageMapStyle = newStyle => {
@@ -21,61 +31,49 @@ export const setStorageMapStyle = newStyle => {
 
 const MapStyleSelector = ({ selected, onStyleChange }) => (
   <ModeSelector>
-    <div hidden>
+    <div>
       <input
         type="radio"
-        id="velou"
-        value="velou"
+        id="dark"
+        value="dark"
         onChange={onStyleChange}
-        checked={selected === "velou"}
+        checked={selected === "dark"}
       />
-      <Switcher htmlFor="velou">
-        <span>Velou</span>
+      <Switcher htmlFor="dark">
+        <em>
+          <i />
+        </em>
+        <span>Dark</span>
       </Switcher>
     </div>
     <div>
       <input
         type="radio"
-        id="magma"
-        value="magma"
+        id="gris"
+        value="gris"
         onChange={onStyleChange}
-        checked={selected === "magma"}
+        checked={selected === "gris"}
       />
-      <Switcher htmlFor="magma">
+      <Switcher htmlFor="gris">
         <em>
           <i />
         </em>
-        <span>Magma</span>
+        <span>Gris</span>
       </Switcher>
     </div>
     <div>
       <input
         type="radio"
-        id="snazzy"
-        value="snazzy"
+        id="lieux"
+        value="lieux"
         onChange={onStyleChange}
-        checked={selected === "snazzy"}
+        checked={selected === "lieux"}
       />
-      <Switcher htmlFor="snazzy">
+      <Switcher htmlFor="lieux">
         <em>
           <i />
         </em>
-        <span>Snazzy</span>
-      </Switcher>
-    </div>
-    <div>
-      <input
-        type="radio"
-        id="mapco"
-        value="mapco"
-        onChange={onStyleChange}
-        checked={selected === "mapco"}
-      />
-      <Switcher htmlFor="mapco">
-        <em>
-          <i />
-        </em>
-        <span>Mapco</span>
+        <span>Lieux</span>
       </Switcher>
     </div>
   </ModeSelector>

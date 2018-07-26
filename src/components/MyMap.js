@@ -22,17 +22,24 @@ import {
   OuputGroup
 } from "./styles";
 
-import SnazzyMapStyle from "../mapStyles/snazzy.json";
-import VelouMap from "../mapStyles/velou.json";
-import MagmaMap from "../mapStyles/magma.json";
-import Mapco from "../mapStyles/mapco.json";
+import GrisMap from "../mapStyles/gris.json";
+// import VelouMap from "../mapStyles/velou.json";
+import DarkMap from "../mapStyles/dark.json";
+// import Mapco from "../mapStyles/mapco.json";
+import LieuxMap from "../mapStyles/lieux.json";
+
+const MapStyles = {
+  gris: GrisMap,
+  dark: DarkMap,
+  lieux: LieuxMap
+};
 
 class MapPage extends React.Component {
   static defaultProps = {
     googleMapURL:
       "https://maps.googleapis.com/maps/api/js?key=AIzaSyAZnF19RSZU0ud4oeIbsOmru1iPnXlpl7w&v=3.exp&libraries=geometry,drawing,places",
     loadingElement: <div style={{ height: "100%" }} />,
-    containerElement: <div style={{ height: "100%" }} />,
+    containerElement: <div className="map" style={{ height: "100%" }} />,
     mapElement: <div style={{ height: "100%" }} />,
     defaultZoom: 12,
     defaultCenter: {
@@ -49,7 +56,7 @@ class MapPage extends React.Component {
     origin: null,
     destination: null,
     distance: null,
-    mapStyle: getStorageMapStyle() || "snazzy"
+    mapStyle: getStorageMapStyle() || "lieux"
   };
 
   _mapRef = null;
@@ -293,12 +300,5 @@ const GoogleMapsWrapper = withGoogleMap(props => {
     </GoogleMap>
   );
 });
-
-const MapStyles = {
-  snazzy: SnazzyMapStyle,
-  velou: VelouMap,
-  magma: MagmaMap,
-  mapco: Mapco
-};
 
 export default MapPage;

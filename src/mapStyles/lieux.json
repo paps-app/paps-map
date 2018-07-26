@@ -22,7 +22,7 @@
     "elementType": "all",
     "stylers": [
       {
-        "visibility": "off"
+        "visibility": "on"
       }
     ]
   },
@@ -136,10 +136,10 @@
     "elementType": "labels.icon",
     "stylers": [
       {
-        "visibility": "off"
+        "visibility": "on"
       },
       {
-        "saturation": "0"
+        "saturation": -10
       }
     ]
   },
@@ -160,7 +160,7 @@
     "elementType": "labels.icon",
     "stylers": [
       {
-        "visibility": "off"
+        "visibility": "on"
       }
     ]
   },
@@ -169,7 +169,7 @@
     "elementType": "all",
     "stylers": [
       {
-        "visibility": "off"
+        "visibility": "on"
       }
     ]
   },
@@ -193,10 +193,28 @@
         "visibility": "on"
       },
       {
-        "saturation": "0"
+        "saturation": -10
       },
       {
         "color": "#aadaff"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#ae9e90"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#dcd2be"
       }
     ]
   }
