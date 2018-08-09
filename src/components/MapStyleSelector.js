@@ -13,9 +13,7 @@ export const getStorageMapStyle = () => {
     // Update monkey patch this value plz 🙂
     if (/magma|mapco|snazzy/.test(tmp)) {
       mapStyleSelected = "lieux";
-      console.log({ mapStyleSelected });
     } else {
-      console.log({ mapStyleSelected });
       mapStyleSelected = tmp;
     }
   }
