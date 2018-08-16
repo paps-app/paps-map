@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
     "lodash.get": "^4.4.2",
+    "rapidapi-connect": "^0.0.6",
     "react": "^16.4.1",
     "react-app-rewire-eslint": "0.2.3",
     "react-app-rewire-styled-components": "3.0.2",
@@ -16,7 +19,9 @@
     "styled-components": "^3.3.3"
   },
   "scripts": {
-    "start": "react-app-rewired start",
+    "start": "concurrently -k -r \"yarn start:dev\" \"yarn start:api\"",
+    "start:dev": "react-app-rewired start",
+    "start:api": "nodemon server/index.js",
     "now-start": "serve --single ./build",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom",
@@ -32,5 +37,10 @@
     "color": "#FF6D00",
     "icon": null,
     "createdAt": 1531588291261
-  }
+  },
+  "devDependencies": {
+    "concurrently": "^3.6.1",
+    "nodemon": "^1.18.3"
+  },
+  "proxy": "http://localhost:5000/"
 }

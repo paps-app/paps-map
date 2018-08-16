@@ -201,45 +201,83 @@ const SubmitButton = styled.button`
   border-radius: 3px;
 `;
 
+const areAllKeysValid = obj =>
+  !Object.keys(obj).some(key => null == obj[key] || "" === obj[key]);
+
 class PopupConfirmation extends React.Component {
   state = {
     isFormValid: false,
-    senderName: null,
-    senderNumber: null,
-    receiverNumber: null,
-    description: null,
-    couponCode: null
+    requiredValues: {
+      senderName: null,
+      senderNumber: null,
+      receiverNumber: null,
+      description: null
+    },
+    optionalValues: {
+      couponCode: null
+    },
+    formValues: {}
+  };
+
+  _handleInputChange = (e, stateKey, stateKeyValue) => {
+    e.persist();
+    this.setState(prevState => ({
+      [stateKey]: { ...prevState[stateKey], [stateKeyValue]: e.target.value }
+    }));
   };
 
   _handleNameChange = e => {
-    this.setState({ senderName: e.target.value });
+    this._handleInputChange(e, "requiredValues", "senderName");
   };
 
   _handleSenderNumberChange = e => {
-    this.setState({ senderNumber: e.target.value });
+    this._handleInputChange(e, "requiredValues", "senderNumber");
   };
 
   _handleReceiverNumberChange = e => {
-    this.setState({ receiverNumber: e.target.value });
+    this._handleInputChange(e, "requiredValues", "receiverNumber");
   };
 
   _handleCouponCodeChange = e => {
-    this.setState({ couponCode: e.target.value });
+    this._handleInputChange(e, "optionalValues", "couponCode");
   };
 
   _handleDescriptionChange = e => {
-    this.setState({ description: e.target.value });
+    this._handleInputChange(e, "requiredValues", "description");
+  };
+
+  _onCreateTask = () => {
+    fetch("/api/v1/createPDTask", {
+      method: "POST",
+      body: JSON.stringify(this.state.formValues),
+      headers: { "Content-Type": "application/json" }
+    })
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(body) {
+        console.log(body);
+      });
+  };
+
+  _onFormSubmit = e => {
+    e.preventDefault();
+    if (areAllKeysValid(this.state.requiredValues)) {
+      this.setState({
+        isFormValid: true,
+        formValues: {
+          ...this.state.requiredValues,
+          ...this.state.optionalValues,
+          ...this.props.placesValues
+        }
+      });
+      this._onCreateTask();
+    }
   };
 
   render() {
     const { onPopupClose, price } = this.props;
-    const {
-      senderName,
-      senderNumber,
-      receiverNumber,
-      couponCode,
-      description
-    } = this.state;
+    const { requiredValues, optionalValues } = this.state;
     return (
       <PopupWrapper>
         <PopupContainer>
@@ -253,7 +291,7 @@ class PopupConfirmation extends React.Component {
             <span>Cette course vous sera facturée à</span>
             <PriceTag>{price} FCFA</PriceTag>
           </PriceIndicator>
-          <MainForm>
+          <MainForm onSubmit={this._onFormSubmit}>
             <InputGroup>
               <div>
                 <input
@@ -261,7 +299,7 @@ class PopupConfirmation extends React.Component {
                   id="name"
                   autoComplete="off"
                   onChange={this._handleNameChange}
-                  {...senderName && { className: "valid" }}
+                  {...requiredValues.senderName && { className: "valid" }}
                   required
                 />
                 <label htmlFor="name">Nom complet</label>
@@ -271,7 +309,7 @@ class PopupConfirmation extends React.Component {
                   type="tel"
                   id="tel"
                   onChange={this._handleSenderNumberChange}
-                  {...senderNumber && { className: "valid" }}
+                  {...requiredValues.senderNumber && { className: "valid" }}
                   required
                 />
                 <label htmlFor="tel">Votre numéro</label>
@@ -283,7 +321,7 @@ class PopupConfirmation extends React.Component {
                   type="tel"
                   id="tel2"
                   onChange={this._handleReceiverNumberChange}
-                  {...receiverNumber && { className: "valid" }}
+                  {...requiredValues.receiverNumber && { className: "valid" }}
                   required
                 />
                 <label htmlFor="tel2">Numéro du destinaire</label>
@@ -294,7 +332,7 @@ class PopupConfirmation extends React.Component {
                   name="desc"
                   id="desc"
                   onChange={this._handleDescriptionChange}
-                  {...description && { className: "valid" }}
+                  {...requiredValues.description && { className: "valid" }}
                   required
                 />
                 <label htmlFor="desc">Description</label>
@@ -306,8 +344,7 @@ class PopupConfirmation extends React.Component {
                   type="number"
                   id="couponCode"
                   onChange={this._handleCouponCodeChange}
-                  {...couponCode && { className: "valid" }}
-                  required
+                  {...optionalValues.couponCode && { className: "valid" }}
                 />
                 <label htmlFor="couponCode">Code coupon</label>
               </div>
@@ -317,7 +354,7 @@ class PopupConfirmation extends React.Component {
               <div>
                 <label htmlFor="cash">
                   Cash (A la livraison)
-                  <input type="radio" name="resp" id="cash" checked="checked" />
+                  <input type="radio" name="resp" id="cash" defaultChecked />
                   <div />
                 </label>
                 <label htmlFor="orangeMoney">
@@ -327,12 +364,30 @@ class PopupConfirmation extends React.Component {
                 </label>
               </div>
             </InputGroupRadio>
-            <SubmitButton type="submit">Confirmer la commande</SubmitButton>
+            <SubmitButton type="submit" onClick={this._onFormSubmit}>
+              Confirmer la commande
+            </SubmitButton>
           </MainForm>
         </PopupContainer>
       </PopupWrapper>
     );
   }
 }
+
+const mapFormValuesToApiValues = formValues => {
+  let apiValues = {};
+  apiValues = {
+    jobPickupName: formValues.senderName,
+    jobDescription: formValues.description,
+    jobPickupAddress: formValues.pickup,
+    jobPickupPhone: formValues.senderNumber,
+    autoAssignment: "0",
+    customerPhone: formValues.receiverNumber,
+    jobDeliveryDatetime: "2018-08-16 17:00:00",
+    customerAddress: formValues.delivery,
+    timezone: "0"
+  };
+  return apiValues;
+};
 
 export default PopupConfirmation;

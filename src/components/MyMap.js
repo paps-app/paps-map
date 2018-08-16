@@ -58,6 +58,10 @@ class MapPage extends React.Component {
     markers: [],
     origin: null,
     destination: null,
+    placesValues: {
+      pickup: null,
+      delivery: null
+    },
     distance: null,
     mapStyle: getStorageMapStyle() || "lieux",
     isPopupOpen: false,
@@ -195,11 +199,12 @@ class MapPage extends React.Component {
 
     const nextMarkers = [{ position: place.geometry.location }];
     const nextCenter = get(nextMarkers, "0.position", this.state.center);
-    this.setState({
+    this.setState(prevState => ({
       center: nextCenter,
       markers: nextMarkers,
-      origin: nextCenter
-    });
+      origin: nextCenter,
+      placesValues: { ...prevState.placesValues, pickup: this._originRef.value }
+    }));
 
     this._mapRef.fitBounds(bounds);
   };
@@ -212,11 +217,11 @@ class MapPage extends React.Component {
 
     const nextMarkers = [{ position: place.geometry.location }];
     const nextCenter = get(nextMarkers, "0.position", this.state.center);
-    this.setState({
+    this.setState(prevState => ({
       center: nextCenter,
-      // markers: nextMarkers,
-      destination: nextCenter
-    });
+      destination: nextCenter,
+      placesValues: { ...prevState.placesValues, delivery: this._destinationRef.value }
+    }));
 
     this._mapRef.fitBounds(bounds);
   };
@@ -300,7 +305,11 @@ class MapPage extends React.Component {
         {state.isPopupOpen && (
           <React.Fragment>
             <OverlayModal onClick={this._onFormValidate} />
-            <PopupConfirmation onPopupClose={this._onFormValidate} price={state.price} />
+            <PopupConfirmation
+              onPopupClose={this._onFormValidate}
+              price={state.price}
+              placesValues={state.placesValues}
+            />
           </React.Fragment>
         )}
         <GoogleMapsWrapper
