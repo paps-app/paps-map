@@ -7,6 +7,8 @@ import PriceIcon from "../icons/price.svg";
 import { DistanceOutput, PriceOuput } from "./styles";
 
 const WillBeCharged = ({ distance }) => {
+  const price = distance !== null ? computeDistanceToPrice(distance) : 0;
+
   if (distance > 60000) {
     return (
       <div>
@@ -21,15 +23,18 @@ const WillBeCharged = ({ distance }) => {
     <React.Fragment>
       <DistanceOutput>
         <img src={DistanceIcon} alt="distance" />
-        {distance !== null ? <b>{Math.round(distance) / 1000}km</b> : <b>0 km</b>}
+        {distance !== null ? (
+          <b>
+            {Math.round(distance) / 1000}
+            km
+          </b>
+        ) : (
+          <b>0 km</b>
+        )}
       </DistanceOutput>
       <PriceOuput>
         <img src={PriceIcon} alt="price" />
-        {distance !== null ? (
-          <b>{computeDistanceToPrice(distance)} FCFA </b>
-        ) : (
-          <b>0 FCFA</b>
-        )}
+        <b>{price} FCFA </b>
       </PriceOuput>
     </React.Fragment>
   );

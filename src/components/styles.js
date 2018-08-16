@@ -10,6 +10,8 @@ injectGlobal`
   body {
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
     margin: 0;
+    font-size: 100%;
+    color: #616c73;
   }
   #root {
     display: flex;
@@ -38,10 +40,6 @@ const FlexAndCenter = css`
   display: flex;
   align-items: center;
   text-align: center;
-`;
-
-export const Separator = styled.div`
-  background-color: #ffd39c;
 `;
 
 export const BaseInput = styled.div`
@@ -136,7 +134,6 @@ export const PriceOuput = styled(OutputGroupContent)`
 `;
 
 export const ModeSelector = styled.div`
-  color: #4c5b73;
   margin-bottom: 1.6em;
   padding: 8px 0;
   ${FlexAndCenter};
@@ -216,4 +213,19 @@ export const Switcher = styled.label`
       transition: left 0.25s, background-color 0.25s;
     }
   }
+`;
+
+export const ValidateButton = styled.button`
+  display: block;
+  border: none;
+  background-color: #406d80;
+  padding: 0 1rem;
+  min-width: 2rem;
+  width: 70%;
+  color: white;
+  margin: 1rem auto 0;
+  height: 2.5rem;
+  cursor: pointer;
+  font-size: 100%;
+  border-radius: 3px;
 `;

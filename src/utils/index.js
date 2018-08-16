@@ -32,6 +32,7 @@ export const computePlace = (place, bounds) => {
       bounds.extend(place.geometry.location);
     }
   } else {
-    throw new Error("Veuillez choisir une position dans la liste déroulante");
+    // throw new Error("Veuillez choisir une position dans la liste déroulante");
+    window.alert("Veuillez sélectionner que les résultats sur la liste défilante");
   }
 };

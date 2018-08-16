@@ -6,8 +6,9 @@ import get from "lodash.get";
 import LabelledMarker from "./MarkerWithLabel";
 import MapStyleSelector from "./MapStyleSelector";
 import WillBeCharged from "./WillBeCharged";
+import PopupConfirmation, { OverlayModal } from "./Popup";
 
-import { computePlace } from "../utils";
+import { computePlace, computeDistanceToPrice } from "../utils";
 
 import { getStorageMapStyle, setStorageMapStyle } from "./MapStyleSelector";
 
@@ -19,7 +20,8 @@ import {
   OriginInput,
   DestinationInput,
   InputGroup,
-  OuputGroup
+  OuputGroup,
+  ValidateButton as Button
 } from "./styles";
 
 import GrisMap from "../mapStyles/gris.json";
@@ -57,7 +59,10 @@ class MapPage extends React.Component {
     origin: null,
     destination: null,
     distance: null,
-    mapStyle: getStorageMapStyle() || "lieux"
+    mapStyle: getStorageMapStyle() || "lieux",
+    isPopupOpen: false,
+    price: 0,
+    hasNotValidatedPlaces: false
   };
 
   _mapRef = null;
@@ -144,9 +149,6 @@ class MapPage extends React.Component {
         }
       );
     }
-    // else {
-    //   window.alert("Veuillez sélectionner que les résultats sur la liste défilante");
-    // }
   }
 
   _handleMapMounted = c => {
@@ -183,7 +185,6 @@ class MapPage extends React.Component {
     this.setState({
       directions: newDirection
     });
-    console.log({ newDirection });
   };
 
   _handleOrginPlaceChanged = () => {
@@ -225,6 +226,27 @@ class MapPage extends React.Component {
     setStorageMapStyle(e.target.value);
   };
 
+  _onFormValidate = () => {
+    if (this.state.destination) {
+      this._onPriceChanged();
+      this.setState({
+        isPopupOpen: !this.state.isPopupOpen
+      });
+    } else {
+      this.setState({ hasNotValidatedPlaces: true });
+      setTimeout(() => {
+        this.setState({ hasNotValidatedPlaces: false });
+      }, 8000);
+    }
+  };
+
+  _onPriceChanged = () => {
+    const { distance } = this.state;
+    if (distance) {
+      this.setState({ price: computeDistanceToPrice(distance) });
+    }
+  };
+
   render() {
     const { props, state } = this;
     return (
@@ -259,7 +281,28 @@ class MapPage extends React.Component {
           <OuputGroup>
             <WillBeCharged distance={state.distance} />
           </OuputGroup>
+          <Button type="submit" onClick={this._onFormValidate}>
+            Valider
+          </Button>
+          {state.hasNotValidatedPlaces && (
+            <div
+              style={{
+                padding: "1rem",
+                marginTop: "1rem",
+                textAlign: "center",
+                color: "red"
+              }}
+            >
+              Veuillez choisir d'abord deux destinations avant de valider la course
+            </div>
+          )}
         </SearchBox>
+        {state.isPopupOpen && (
+          <React.Fragment>
+            <OverlayModal onClick={this._onFormValidate} />
+            <PopupConfirmation onPopupClose={this._onFormValidate} price={state.price} />
+          </React.Fragment>
+        )}
         <GoogleMapsWrapper
           onMapMounted={this._handleMapMounted}
           onBoundsChanged={this._handleBoundsChanged}
