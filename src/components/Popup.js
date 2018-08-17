@@ -1,5 +1,8 @@
 import React from "react";
+import axios from "axios";
 import styled from "styled-components";
+
+import { formatDateToString } from "../utils";
 
 const PopupWrapper = styled.div`
   display: flex;
@@ -247,31 +250,25 @@ class PopupConfirmation extends React.Component {
   };
 
   _onCreateTask = () => {
-    fetch("/api/v1/createPDTask", {
-      method: "POST",
-      body: JSON.stringify(this.state.formValues),
-      headers: { "Content-Type": "application/json" }
-    })
-      .then(function(response) {
-        return response.json();
-      })
-      .then(function(body) {
-        console.log(body);
-      });
+    const dataToSend = mapFormValuesToApiValues(this.state.formValues);
+
+    axios.post("/api/v1/createPDTask", dataToSend).then(res => console.log(res.data));
   };
 
   _onFormSubmit = e => {
     e.preventDefault();
     if (areAllKeysValid(this.state.requiredValues)) {
-      this.setState({
-        isFormValid: true,
+      this.setState(prevState => ({
         formValues: {
-          ...this.state.requiredValues,
-          ...this.state.optionalValues,
+          ...prevState.requiredValues,
+          ...prevState.optionalValues,
           ...this.props.placesValues
-        }
-      });
-      this._onCreateTask();
+        },
+        isFormValid: true
+      }));
+      setTimeout(() => {
+        this._onCreateTask();
+      }, 500);
     }
   };
 
@@ -383,7 +380,8 @@ const mapFormValuesToApiValues = formValues => {
     jobPickupPhone: formValues.senderNumber,
     autoAssignment: "0",
     customerPhone: formValues.receiverNumber,
-    jobDeliveryDatetime: "2018-08-16 17:00:00",
+    jobPickupDatetime: formatDateToString(new Date(), 1),
+    jobDeliveryDatetime: formatDateToString(new Date(), 3),
     customerAddress: formValues.delivery,
     timezone: "0"
   };

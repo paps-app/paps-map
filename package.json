@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
+    "http-proxy": "^1.17.0",
     "lodash.get": "^4.4.2",
     "rapidapi-connect": "^0.0.6",
     "react": "^16.4.1",
@@ -42,5 +44,10 @@
     "concurrently": "^3.6.1",
     "nodemon": "^1.18.3"
   },
-  "proxy": "http://localhost:5000/"
+  "proxy": {
+    "/api/v1": {
+      "target": "http://localhost:8080",
+      "secure": false
+    }
+  }
 }

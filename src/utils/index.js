@@ -36,3 +36,17 @@ export const computePlace = (place, bounds) => {
     window.alert("Veuillez sélectionner que les résultats sur la liste défilante");
   }
 };
+
+export const formatDateToString = (date, pad) => {
+  let year = date.getFullYear();
+  let month = date.getMonth();
+  let day = date.getDate();
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+  let padder = pad || 0;
+
+  const leadWithZero = t => (t = t < 10 ? `0${t}` : t);
+
+  const strTime = `${leadWithZero(hours + padder)}:${leadWithZero(minutes)}:00`;
+  return `${year}-${leadWithZero(month + 1)}-${leadWithZero(day)} ${strTime}`;
+};

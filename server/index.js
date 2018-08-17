@@ -1,4 +1,4 @@
-const port = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 /* eslint no-console: 0 */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-unused-vars */
@@ -9,8 +9,12 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const RapidAPI = require("rapidapi-connect");
 
+const queryStringToObject = require("./strToObj");
+
 const app = express();
-app.use(bodyParser.json({ type: "application/json" }));
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
@@ -28,12 +32,12 @@ const objetcToQueryString = params =>
     .join("&");
 
 const queryToObject = string =>
-  JSON.parse(
-    `{"${decodeURI(string)
-      .replace(/"/g, '\\"')
-      .replace(/&/g, '","')
-      .replace(/=/g, '":"')}"}`
-  );
+  JSON.parse('{"' + string.replace(/&/g, '","').replace(/=/g, '":"') + '"}', function(
+    key,
+    value
+  ) {
+    return key === "" ? value : decodeURIComponent(value);
+  });
 
 function rapidOnly(func, args = {}) {
   return rapid
@@ -86,14 +90,16 @@ app.get("/api/v1/customers", (req, res) => {
   }
 });
 
-app.get("/api/v1/createPDTask", (req, res) => {
-  rapidOnly("createPickupAndDeliveryTask", queryToObject(req.query)).on(
-    "success",
-    payload => {
+app.post("/api/v1/createPDTask", (req, res) => {
+  console.log(req.body);
+  rapidOnly("createPickupAndDeliveryTask", req.body)
+    .on("success", payload => {
       res.json({ payload });
-    }
-  );
-  console.info("Creating a task with Pickup and Delivery infos");
+      console.info("Creating a task with Pickup and Delivery infos");
+    })
+    .on("error", payload => {
+      console.log(payload);
+    });
 });
 
-app.listen(port, () => console.log("API is running on localhost:5000 🎉 "));
+app.listen(PORT, () => console.log("API is running on localhost:5000 🎉 "));
