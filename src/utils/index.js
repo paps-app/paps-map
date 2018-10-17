@@ -1,3 +1,7 @@
+export { isOffWorkingHours } from "./dates";
+export { getStoredMapCountry, setStoredMapCountry } from "./localStorage";
+export { computeTotalDistance } from "./map";
+
 export const computeDistanceToPrice = distance => {
   let monee = 0;
   if (distance <= 2500) {
@@ -37,16 +41,22 @@ export const computePlace = (place, bounds) => {
   }
 };
 
-export const formatDateToString = (date, pad) => {
+export const formatDateToString = (d, pad, tomorrow) => {
+  const date = new Date(d);
   let year = date.getFullYear();
   let month = date.getMonth();
   let day = date.getDate();
   let hours = date.getHours();
   let minutes = date.getMinutes();
+
   let padder = pad || 0;
+  let whatDay = tomorrow ? day + 1 : day;
+  let whatHour = tomorrow ? 8 : hours;
 
   const leadWithZero = t => (t = t < 10 ? `0${t}` : t);
 
-  const strTime = `${leadWithZero(hours + padder)}:${leadWithZero(minutes)}:00`;
-  return `${year}-${leadWithZero(month + 1)}-${leadWithZero(day)} ${strTime}`;
+  const strTime = `${leadWithZero(whatHour + padder)}:${leadWithZero(minutes)}:00`;
+  return `${year}-${leadWithZero(month + 1)}-${leadWithZero(whatDay)} ${strTime}`;
 };
+
+// console.log(formatDateToString(new Date(), 1));

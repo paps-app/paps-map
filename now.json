@@ -1,6 +1,5 @@
 {
-  "name": "Paps Map",
+  "name": "paps-map",
   "alias": "paps-map.now.sh",
-  "public": false,
-  "type": "static"
+  "public": true
 }
