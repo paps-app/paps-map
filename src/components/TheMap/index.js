@@ -127,9 +127,6 @@ class MapPage extends React.Component {
               stopover: true
             }
           ],
-          drivingOptions: {
-            departureTime: new Date(Date.now())
-          },
           provideRouteAlternatives: false,
           optimizeWaypoints: true,
           avoidTolls: true
