@@ -4,10 +4,8 @@ export { computeTotalDistance } from "./map";
 
 export const computeDistanceToPrice = distance => {
   let monee = 0;
-  let monee1 = 0;
   if (distance <= 2500) {
-    monee = 1000 || 25900;
-    monee1 = 25;
+    monee = 1000;
   } else if (distance > 2500 && distance <= 7500) {
     monee = 1500;
   } else if (distance > 7500 && distance <= 12500) {
