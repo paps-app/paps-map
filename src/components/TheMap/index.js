@@ -1,12 +1,24 @@
+/* eslint-disable no-undef  */
 import React from "react";
 
-import { GoogleMap, withGoogleMap, DirectionsRenderer, Marker } from "react-google-maps";
+import {
+  GoogleMap,
+  withGoogleMap,
+  DirectionsRenderer,
+  Marker
+} from "react-google-maps";
 import get from "lodash.get";
 
 // import TheModal from "components/TheModal";
 import MapSearchBox from "components/SearchBox";
 
-import { computePlace, computeDistanceToPrice, computeTotalDistance } from "utils";
+import {
+  computePlace,
+  computeTotalDistance,
+  computeDistanceToScooterPrice,
+  computeDistanceToBerlingoPrice,
+  computeDistanceToJumperPrice
+} from "utils";
 
 import { getStorageMapStyle, setStorageMapStyle } from "components/MapSelector";
 
@@ -31,10 +43,12 @@ const InitialState = {
     delivery: null
   },
   distance: null,
-  vehicleType: "moto",
+  vehicleType: "scooter",
+  deliveryType: "express",
   mapStyle: getStorageMapStyle() || "gris",
   isModalOpen: false,
   price: 0,
+  priceDelivery: 0,
   hasNotValidatedPlaces: false
 };
 
@@ -226,7 +240,7 @@ class MapPage extends React.Component {
     this.setState({ mapStyle: e.target.value });
     setStorageMapStyle(e.target.value);
   };
-
+  //for vehicleType
   _onFormValidate = () => {
     if (this.state.destination && this.state.distance < 70000) {
       this._onPriceChanged();
@@ -243,12 +257,25 @@ class MapPage extends React.Component {
   };
 
   _onPriceChanged = () => {
-    const { distance, vehicleType } = this.state;
-    let price = computeDistanceToPrice(distance);
+    const { distance, deliveryType, vehicleType } = this.state;
+    let price = 0;
 
-    if (vehicleType === "car") {
-      price = price * 2;
+    switch (vehicleType) {
+      case "scooter":
+        price = computeDistanceToScooterPrice(distance, deliveryType);
+        break;
+      case "berlingo":
+        price = computeDistanceToBerlingoPrice(distance, deliveryType);
+        break;
+      case "jumper":
+        price = computeDistanceToJumperPrice(distance, deliveryType);
+        break;
+
+      default:
+        price = computeDistanceToScooterPrice(distance, deliveryType);
+        break;
     }
+
     if (distance) {
       this.setState({ price });
     }
@@ -260,6 +287,26 @@ class MapPage extends React.Component {
     });
   };
 
+  __changeDeliveryType = e => {
+    this.setState({
+      deliveryType: e.target.value
+    });
+  };
+
+  __onFormValidate = () => {
+    if (this.state.destination && this.state.distance < 70000) {
+      this.__onPriceChanged();
+      this.setState({
+        isModalOpen: !this.state.isModalOpen
+      });
+      document.getElementById("root").classList.toggle("lock-scroll");
+    } else {
+      this.setState({ hasNotValidatedPlaces: true });
+      setTimeout(() => {
+        this.setState({ hasNotValidatedPlaces: false });
+      }, 8000);
+    }
+  };
   render() {
     const { props, state } = this;
     return (
@@ -268,11 +315,15 @@ class MapPage extends React.Component {
           mapCountryCode={props.defaultCountryCode}
           onCountryChange={props.changeDefaultCountryCode}
           vehicleType={state.vehicleType}
+          deliveryType={state.deliveryType}
           onVehicleTypeChange={this._changeVehicleType}
+          onDeliveryTypeChange={this.__changeDeliveryType}
           hasNotValidatedPlaces={state.hasNotValidatedPlaces}
           distance={state.distance}
           price={state.price}
+          priceDelivery={state.priceDelivery}
           onFormValidate={this._onFormValidate}
+          _onFormValidate={this.__onFormValidate}
           onOriginBoxMounted={this._onOriginBoxMounted}
           onDestinationBoxMounted={this._onDestinationBoxMounted}
         />

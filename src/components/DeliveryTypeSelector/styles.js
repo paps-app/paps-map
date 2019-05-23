@@ -17,8 +17,8 @@ export const ModeSelector = styled.div`
 `;
 
 export const Switcher = styled.div`
-  width: 2.2rem;
-  height: 2.2rem;
+  width: 6.5rem;
+  height: 3rem;
 
   label {
     ${FlexAndCenter};

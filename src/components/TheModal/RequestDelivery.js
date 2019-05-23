@@ -113,7 +113,10 @@ class RequestDelivery extends React.Component {
         if (data) {
           this.setState({ formResponse: data, isSubmitting: false });
         } else {
-          this.setState({ isSubmitting: false, formErrors: { hasErrors: true } });
+          this.setState({
+            isSubmitting: false,
+            formErrors: { hasErrors: true }
+          });
           setTimeout(() => {
             this.setState(({ formErrors }) => ({
               formErrors: { ...formErrors, hasErrors: false }
@@ -169,7 +172,8 @@ class RequestDelivery extends React.Component {
     const valInput = e.target.value;
     const valId = e.target.id;
 
-    const isNumberCorrect = /^\d+$/.test(valInput) && valInput.match(/\d/g).length === 9;
+    const isNumberCorrect =
+      /^\d+$/.test(valInput) && valInput.match(/\d/g).length === 9;
 
     this.setState(({ formErrors }) => ({
       formErrors: {
@@ -208,7 +212,9 @@ class RequestDelivery extends React.Component {
     return (
       <React.Fragment>
         <ModalHeader>
-          <h2>{formResponse ? "Commande confirmée" : "Continuer la commande"}</h2>
+          <h2>
+            {formResponse ? "Commande confirmée" : "Continuer la commande"}
+          </h2>
           <CloseModalBtn type="button" onClick={onModalClose}>
             <CrossIcon />
           </CloseModalBtn>
@@ -271,7 +277,10 @@ class RequestDelivery extends React.Component {
                   Vérifiez que tous les champs sont bien remplis
                 </InfoMsg>
               )}
-              <SubmitButton type="submit" {...isSubmitting && { className: "disabled" }}>
+              <SubmitButton
+                type="submit"
+                {...isSubmitting && { className: "disabled" }}
+              >
                 Confirmer la commande
               </SubmitButton>
             </MainForm>

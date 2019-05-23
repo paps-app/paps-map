@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components";
+import styled, { css } from "styled-components/macro";
 
 import { medias } from "utils/styles";
 
@@ -231,7 +231,9 @@ export const Input = styled.div`
   &.focused {
     label {
       transform: ${p =>
-        p.labelY ? "translateY(-22%) scale(0.77)" : "translateY(-50%) scale(0.77)"};
+        p.labelY
+          ? "translateY(-22%) scale(0.77)"
+          : "translateY(-50%) scale(0.77)"};
     }
 
     .indicator {

@@ -1,6 +1,10 @@
 import React from "react";
 
-import { computeDistanceToPrice } from "utils";
+import {
+  computeDistanceToScooterPrice,
+  computeDistanceToBerlingoPrice,
+  computeDistanceToJumperPrice
+} from "utils";
 
 import DistanceIcon from "icons/distance.svg";
 import PriceIcon from "icons/price.svg";
@@ -11,11 +15,25 @@ const round = (value, precision) => {
   return Math.round(value * multiplier) / multiplier;
 };
 
-const PriceDisplay = ({ vehicleType, distance }) => {
-  let price = distance !== null ? computeDistanceToPrice(distance) : 0;
+export const PriceDisplay = ({ vehicleType, deliveryType, distance }) => {
+  let price = 0;
 
-  if (vehicleType && vehicleType === "car") {
-    price = price * 2;
+  if (distance !== null) {
+    switch (vehicleType) {
+      case "scooter":
+        price = computeDistanceToScooterPrice(distance, deliveryType);
+        break;
+      case "berlingo":
+        price = computeDistanceToBerlingoPrice(distance, deliveryType);
+        break;
+      case "jumper":
+        price = computeDistanceToJumperPrice(distance, deliveryType);
+        break;
+
+      default:
+        price = computeDistanceToScooterPrice(distance, deliveryType);
+        break;
+    }
   }
 
   if (distance > 60000) {
@@ -27,8 +45,8 @@ const PriceDisplay = ({ vehicleType, distance }) => {
           padding: "0 1rem"
         }}
       >
-        Cette course dépasse 60km, veuillez choisir les tarifs des régions pour la prise
-        en charge{" "}
+        Cette course dépasse 60km, veuillez choisir les tarifs des régions pour
+        la prise en charge{" "}
         <span role="img" aria-label="ok">
           🙂.
         </span>
@@ -60,8 +78,9 @@ const PriceDisplay = ({ vehicleType, distance }) => {
             padding: "0 1rem"
           }}
         >
-          Les courses de cette distance ne sont pas supportées sur le site. Veuillez
-          appeler le <a href="tel:+221781203020">+221781203020</a> pour la prise en charge{" "}
+          Les courses de cette distance ne sont pas supportées sur le site.
+          Veuillez appeler le <a href="tel:+221781203020">+221781203020</a> pour
+          la prise en charge{" "}
           <span role="img" aria-label="ok">
             🙂.
           </span>
@@ -70,5 +89,3 @@ const PriceDisplay = ({ vehicleType, distance }) => {
     </React.Fragment>
   );
 };
-
-export default PriceDisplay;
