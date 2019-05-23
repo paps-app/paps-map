@@ -11,26 +11,26 @@ const VehicleTypeSelector = ({ selected, onVehicleTypeChange }) => (
     <Switcher>
       <input
         type="radio"
-        id="moto"
-        value="moto"
+        id="scooter"
+        value="scooter"
         onChange={onVehicleTypeChange}
-        checked={selected === "moto"}
+        checked={selected === "scooter"}
       />
-      <label htmlFor="moto" title="Moto">
+      <label htmlFor="scooter" title="scooter">
         <MotoIcon />
-        <span>Moto</span>
+        <span>Scooter</span>
       </label>
     </Switcher>
     <Switcher>
       <input
         type="radio"
-        id="car"
+        id="berlingo"
         title="voiture"
-        value="car"
+        value="berlingo"
         onChange={onVehicleTypeChange}
-        checked={selected === "car"}
+        checked={selected === "berlingo"}
       />
-      <label htmlFor="car" title="Auto">
+      <label htmlFor="berlingo" title="Auto">
         <CarIcon />
         <span>Voiture</span>
       </label>
@@ -38,17 +38,16 @@ const VehicleTypeSelector = ({ selected, onVehicleTypeChange }) => (
     <Switcher>
       <input
         type="radio"
-        id="van"
-        value="van"
+        id="jumper"
+        value="jumper"
         onChange={onVehicleTypeChange}
-        checked={selected === "van"}
+        checked={selected === "jumper"}
       />
-      <label htmlFor="van" title="Camion">
+      <label htmlFor="jumper" title="Camion">
         <VanIcon />
-        <span>Van</span>
+        <span>jumper</span>
       </label>
     </Switcher>
   </ModeSelector>
 );
-
 export default VehicleTypeSelector;

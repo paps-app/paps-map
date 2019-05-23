@@ -1,9 +1,9 @@
 import React from "react";
 
 import {
-  computeDistanceToPrice,
-  computeDistanceToPriceMinivan,
-  computeDistanceToPriceVan
+  computeDistanceToScooterPrice,
+  computeDistanceToBerlingoPrice,
+  computeDistanceToJumperPrice
 } from "utils";
 
 import DistanceIcon from "icons/distance.svg";
@@ -15,17 +15,27 @@ const round = (value, precision) => {
   return Math.round(value * multiplier) / multiplier;
 };
 
-const PriceDisplay = ({ vehicleType, distance }) => {
-  let price = distance !== null ? computeDistanceToPrice(distance) : 0;
-  let priceMinivan =
-    distance !== null ? computeDistanceToPriceMinivan(distance) : 0;
-  let priceVan = distance !== null ? computeDistanceToPriceVan(distance) : 0;
-  if (vehicleType && vehicleType === "car") {
-    price = priceMinivan;
+export const PriceDisplay = ({ vehicleType, deliveryType, distance }) => {
+  let price = 0;
+
+  if (distance !== null) {
+    switch (vehicleType) {
+      case "scooter":
+        price = computeDistanceToScooterPrice(distance, deliveryType);
+        break;
+      case "berlingo":
+        price = computeDistanceToBerlingoPrice(distance, deliveryType);
+        break;
+      case "jumper":
+        price = computeDistanceToJumperPrice(distance, deliveryType);
+        break;
+
+      default:
+        price = computeDistanceToScooterPrice(distance, deliveryType);
+        break;
+    }
   }
-  if (vehicleType && vehicleType === "van") {
-    price = priceVan;
-  }
+
   if (distance > 60000) {
     return (
       <div
@@ -79,5 +89,3 @@ const PriceDisplay = ({ vehicleType, distance }) => {
     </React.Fragment>
   );
 };
-
-export default PriceDisplay;

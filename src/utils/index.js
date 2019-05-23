@@ -2,7 +2,7 @@ export { isOffWorkingHours } from "./dates";
 export { getStoredMapCountry, setStoredMapCountry } from "./localStorage";
 export { computeTotalDistance } from "./map";
 
-export const computeDistanceToPrice = distance => {
+export const computeDistanceToScooterPrice = (distance, deliveryType) => {
   let monee = 0;
   if (distance <= 2500) {
     monee = 1000;
@@ -25,10 +25,15 @@ export const computeDistanceToPrice = distance => {
   } else {
     monee = null;
   }
+
+  if (deliveryType === "express") {
+    monee += 500;
+  }
+
   return monee;
 };
 
-export const computeDistanceToPriceMinivan = distance => {
+export const computeDistanceToBerlingoPrice = (distance, deliveryType) => {
   let monee = 0;
   if (distance <= 2500) {
     monee = 4000;
@@ -51,10 +56,15 @@ export const computeDistanceToPriceMinivan = distance => {
   } else {
     monee = null;
   }
+
+  if (deliveryType === "express") {
+    monee += 2000;
+  }
+
   return monee;
 };
 
-export const computeDistanceToPriceVan = distance => {
+export const computeDistanceToJumperPrice = (distance, deliveryType) => {
   let monee = 0;
   if (distance <= 2500) {
     monee = 8000;
@@ -77,8 +87,13 @@ export const computeDistanceToPriceVan = distance => {
   } else {
     monee = null;
   }
+
+  if (deliveryType === "express") {
+    monee += 4000;
+  }
   return monee;
 };
+//end evening pricing
 
 export const computePlace = (place, bounds) => {
   if (place.geometry) {

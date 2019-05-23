@@ -5,8 +5,9 @@ import { isOffWorkingHours } from "utils";
 import { PapsLogo } from "shared/styles";
 
 import VehicleTypeSelector from "components/VehicleTypeSelector";
+import DeliveryTypeSelector from "components/DeliveryTypeSelector";
 import CountrySelector from "components/CountrySelector";
-import PriceDisplay from "components/PriceDisplay";
+import { PriceDisplay } from "components/PriceDisplay";
 
 import LogoColored from "assets/images/logo-colored.png";
 
@@ -26,16 +27,23 @@ import {
 const MapSearchBox = ({
   mapCountryCode,
   price,
+  priceDelivery,
+  DeliverypriceDelivery,
   vehicleType,
   onVehicleTypeChange,
+  onDeliveryTypeChange,
+  deliveryType,
   onCountryChange,
   hasNotValidatedPlaces,
   distance,
   onFormValidate,
+  _onFormValidate,
   onOriginBoxMounted,
   onDestinationBoxMounted
 }) => {
-  let workingMsg = isOffWorkingHours("08:30:00", "17:30:00") ? "Fermé" : "Ouvert";
+  let workingMsg = isOffWorkingHours("08:30:00", "17:30:00")
+    ? "Fermé"
+    : "Ouvert";
 
   if (mapCountryCode === "bf") {
     workingMsg = isOffWorkingHours("08:00:00", "23:00:00") ? "Fermé" : "Ouvert";
@@ -49,7 +57,10 @@ const MapSearchBox = ({
       </PapsLogo>
       <InputGroup>
         <OptionsSelector>
-          <CountrySelector selected={mapCountryCode} onCountryChange={onCountryChange} />
+          <CountrySelector
+            selected={mapCountryCode}
+            onCountryChange={onCountryChange}
+          />
           <VehicleTypeSelector
             selected={vehicleType}
             onVehicleTypeChange={onVehicleTypeChange}
@@ -75,23 +86,18 @@ const MapSearchBox = ({
         </DestinationInput>
       </InputGroup>
       <OuputGroup>
-        <PriceDisplay vehicleType={vehicleType} distance={distance} />
+        <PriceDisplay
+          deliveryType={deliveryType}
+          vehicleType={vehicleType}
+          distance={distance}
+        />
       </OuputGroup>
-      {/* <Button type="submit" onClick={onFormValidate}>
-        Valider
-      </Button>
-      {hasNotValidatedPlaces && (
-        <div
-          style={{
-            padding: "1rem",
-            marginTop: "1rem",
-            textAlign: "center",
-            color: "red"
-          }}
-        >
-          Veuillez choisir d'abord deux destinations valides avant de confirmer la course
-        </div>
-      )} */}
+      <OptionsSelector>
+        <DeliveryTypeSelector
+          selected={deliveryType}
+          onDeliveryTypeChange={onDeliveryTypeChange}
+        />
+      </OptionsSelector>
       <AreWeOff>
         <span>Service de prise de commande: </span>
         <AreWeOffState state={workingMsg}>{workingMsg}</AreWeOffState>
