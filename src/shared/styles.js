@@ -1,4 +1,4 @@
-import styled, { css, injectGlobal } from "styled-components";
+import styled, { css, createGlobalStyle } from "styled-components/macro";
 
 import { medias } from "utils/styles";
 
@@ -6,7 +6,7 @@ import { medias } from "utils/styles";
 // const destinationColor = "#ff9800";
 export const PrimaryColor = "#33a0bf";
 
-injectGlobal`
+export const GlobalStyles = createGlobalStyle`
   html {
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     overflow-x: hidden;

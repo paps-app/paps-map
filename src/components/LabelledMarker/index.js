@@ -2,7 +2,7 @@ import React from "react";
 import { Marker, InfoWindow } from "react-google-maps";
 import { compose, withStateHandlers } from "recompose";
 
-// import styled from "styled-components";
+// import styled from "styled-components/macro";
 
 // const shareStyle = {
 //   // position: "absolute",
@@ -55,18 +55,24 @@ const enhanceMaker = compose(
   )
 );
 
-const LabelledMarker = enhanceMaker(({ position, dir, icon, isOpen, onToggleOpen }) => (
-  <Marker position={position} icon={icon} onClick={onToggleOpen}>
-    {isOpen && <LabelledInfo dir={dir} onToggleOpen={onToggleOpen} />}
-  </Marker>
-));
+const LabelledMarker = enhanceMaker(
+  ({ position, dir, icon, isOpen, onToggleOpen }) => (
+    <Marker position={position} icon={icon} onClick={onToggleOpen}>
+      {isOpen && <LabelledInfo dir={dir} onToggleOpen={onToggleOpen} />}
+    </Marker>
+  )
+);
 
 export const LabelledInfo = ({ dir, onToggleOpen }) => (
   <InfoWindow
     onCloseClick={onToggleOpen}
     options={{ closeBoxURL: "", enableEventPropagation: true }}
   >
-    {dir === "origin" ? <span>Point de départ</span> : <span>Point d'arrivée</span>}
+    {dir === "origin" ? (
+      <span>Point de départ</span>
+    ) : (
+      <span>Point d'arrivée</span>
+    )}
   </InfoWindow>
 );
 

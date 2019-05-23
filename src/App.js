@@ -2,6 +2,7 @@ import React, { Component } from "react";
 
 import TheMap from "components/TheMap";
 import { getStoredMapCountry, setStoredMapCountry } from "utils";
+import { GlobalStyles } from "shared/styles";
 
 const Senegal = {
   lat: 14.72653,
@@ -41,14 +42,21 @@ class App extends Component {
   };
 
   render() {
-    const { defaultMapCenter, defaultCountryCode, defaultMapChangeCount } = this.state;
+    const {
+      defaultMapCenter,
+      defaultCountryCode,
+      defaultMapChangeCount
+    } = this.state;
     return (
-      <TheMap
-        key={defaultMapChangeCount}
-        defaultMapCenter={defaultMapCenter}
-        defaultCountryCode={defaultCountryCode}
-        changeDefaultCountryCode={this._changeDefaultCountryCode}
-      />
+      <>
+        <GlobalStyles />
+        <TheMap
+          key={defaultMapChangeCount}
+          defaultMapCenter={defaultMapCenter}
+          defaultCountryCode={defaultCountryCode}
+          changeDefaultCountryCode={this._changeDefaultCountryCode}
+        />
+      </>
     );
   }
 }
