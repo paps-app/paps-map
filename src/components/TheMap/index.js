@@ -55,7 +55,7 @@ const InitialState = {
 class MapPage extends React.Component {
   static defaultProps = {
     googleMapURL:
-      "https://maps.googleapis.com/maps/api/js?key=AIzaSyAZnF19RSZU0ud4oeIbsOmru1iPnXlpl7w&v=3.exp&libraries=geometry,drawing,places",
+      "https://maps.googleapis.com/maps/api/js?key=AIzaSyDCR2ycw5W4neIDEI7h3xnBtoDBk92h394&v=3.exp&libraries=geometry,drawing,places",
     loadingElement: <div style={{ height: "100%" }} />,
     containerElement: <div className="map" style={{ height: "100%" }} />,
     mapElement: <div style={{ height: "100%" }} />,
